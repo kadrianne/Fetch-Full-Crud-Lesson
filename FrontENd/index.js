@@ -1,71 +1,17 @@
 document.addEventListener('DOMContentLoaded', ()=>{
+  console.log('DomContentLoaded')
 
+  fetch('http://localhost:3000/comments') // one paramater assumes GET request, fetch returns a Promise (eventual value)
+    .then(response => response.json()) // .then() waits for Promise return value from fetch, return from this .then is parsed json
+    .then(comments => ourFunction(comments))
 
-  fetch('http://localhost:3000/comments')
-    .then(response => response.json())
-    .then(result => handleCommentData(result))
-
-
-    function handleCommentData(comments){
-      console.table(comments)
-      comments.map(comment => {
-          renderId(comment)
-          renderComment(comment.content, comment.id)
-      })
-    }
-
-
-    function renderId(comment){
-      console.log('renderId', comment)
-    }
-
-    function renderComment(bananas, id){
-      const commentsContainer = document.querySelector('#commentsUl')
-      const commentContent = document.createElement('li')
-      commentContent.textContent = bananas
-      commentsContainer.appendChild(commentContent)
-      createDeleteButton(commentContent, id)
-    }
-
-
-    function createDeleteButton(commentContent, id){
-      const deleteButton = document.createElement('button')
-      deleteButton.innerText = 'delete'
-      commentContent.appendChild(deleteButton)
-      deleteButton.addEventListener('click', event => deleteComment(id))
-    }
-
-    function deleteComment(id){
-      console.log(id)
-      event.target.parentNode.remove()
-      fetch(`http://localhost:3000/comments/${id}`, {method:'DELETE'})
-    }
-
-
-    const commentsForm = document.querySelector('#comments-form')
-
-    commentsForm.addEventListener('submit', ()=>{
-      event.preventDefault()
-      getUserComment(commentsForm)
+  function ourFunction(comments){
+    
+    comments.map(comment=>{
+      const commentContent = document.createElement('p');
+      commentContent.innerText = comment.content
+      document.body.append(commentContent)
     })
-
-    function getUserComment(commentsForm){
-      const newFormData = new FormData(commentsForm)
-      const formComment = newFormData.get('comment')
-      renderComment(formComment)
-      sendUserComment(formComment)
-    }
-
-
-    function sendUserComment(content){
-      fetch('http://localhost:3000/comments', {
-        method:'POST',
-        headers:{
-          'Accept':'application/json',
-          'Content-Type':'application/json'
-        },
-        body:JSON.stringify({content})
-      })
-    }
+  }
 
 })
